@@ -1,6 +1,6 @@
 # Tax Agent AI — One-Pager
 
-**Problem statement (one line):** In B2B SaaS tax & finance ops, revenue reported by the internal billing system does not match revenue reported by the third-party tax platform (e.g., Avalara / Vertex / TaxJar), and finance must determine the *correct* sales tax liability — but the root cause is often subtle and the mismatch doesn't self-resolve.
+**Problem statement (one line):** In B2B SaaS tax & finance ops, revenue reported by the internal billing system does not match revenue reported by the third-party tax platform (e.g., Stripe Tax, Avalara / Vertex / TaxJar), and finance must determine the *correct* sales tax liability — but the root cause is often subtle and the mismatch doesn't self-resolve.
 
 ---
 
@@ -49,7 +49,7 @@ Because the mismatch is a **classification disagreement**, it does **not** auto-
 | **Finance / Tax Analyst** (primary) | Financially literate, not a tax attorney | Understand *why* numbers differ, see evidence, confirm/correct, get to the right liability fast |
 | **Tax / Revenue Controller** (approver) | Owns the liability decision | Confidence + audit trail before approving a true-up or filing |
 | **Catalog / RevOps** (secondary) | Maintains SKU taxonomy | Clear signal when a category is wrong and what to fix it to |
-| **Third-party tax platform** | Avalara / Vertex / TaxJar | External source of rules + computed liability (a system, not an interactive user) |
+| **Third-party tax platform** | Stripe Tax / Avalara / Vertex / TaxJar | External source of rules + computed liability (a system, not an interactive user) |
 | **AI Agents** (the solution) | The system we design | Continuously prevent, detect, and resolve classification gaps |
 
 ---
