@@ -42,7 +42,19 @@ Because the mismatch is a **classification disagreement**, it does **not** auto-
 
 ---
 
-## 4. Involved Users
+## 4. Use cases
+
+Three concrete scenarios the system must handle:
+
+1. **New SKU → tax category classification.** When a new SKU is created in the catalog, the agent proactively assigns the correct tax category (e.g., *taxable* vs. *exempt*) instead of leaving it blank or defaulting to *exempt*. This is the *prevention* path — it stops the classification gap from being born.
+2. **Discrepancy debug (internal vs. tax platform).** When a revenue/tax mismatch already exists, the agent investigates, determines which side is correct, explains it with evidence, and recommends a true-up/refund.
+3. **Regulation-change alert.** When a state/jurisdiction changes a taxability rule or rate, the agent flags the affected SKUs, quantifies the impact, and drives the fix (update taxonomy and/or rate) before it becomes a surprise tax bill.
+
+Use case 1 runs continuously in the background (Agent 1). Use cases 2 & 3 are driven by detected mismatches or external rule changes.
+
+---
+
+## 5. Involved Users
 
 | Role | Who | What they need |
 |------|-----|----------------|

@@ -117,6 +117,7 @@
       <div class="switch">
         <button id="btnDisc" class="active" onclick="goPanel('disc')">Debug</button>
         <button id="btnRule" onclick="goPanel('rule')">Rule alert</button>
+        <button id="btnSku" onclick="goPanel('sku')">New SKU</button>
       </div>
     </div>
     <div class="chatwrap">
@@ -165,7 +166,8 @@ function suggest(arr){document.getElementById('suggest').innerHTML=arr.map(funct
 // Persistent quick-access buttons (always visible above the composer)
 var quickBtns={
   disc:['Why did this change?','Show source txns','View rule detail','✅ Approve reclass','Open in tax platform'],
-  rule:['Why did the rate change?','Show old vs new tax','View rule detail','✅ Apply new rate','Open in tax platform']
+  rule:['Why did the rate change?','Show old vs new tax','View rule detail','✅ Apply new rate','Open in tax platform'],
+  sku:['Why this category?','Show similar SKUs','View classification rule','✅ Confirm category','Edit if wrong']
 };
 function persistentSuggest(){
   var arr=quickBtns[model]||[];
@@ -191,7 +193,12 @@ function send(){
 
 function respond(q){
   q=q.toLowerCase();
-  if(q.indexOf('approve')>=0||q.indexOf('apply')>=0||q.indexOf('yes')>=0||q.indexOf('confirm')>=0){
+  if(q.indexOf('approve')>=0||q.indexOf('apply')>=0||q.indexOf('yes')>=0||q.indexOf('confirm')>=0||q.indexOf('correct')>=0){
+    if(model==='sku'){
+      removeQuick('✅ Confirm category');
+      setTimeout(function(){toast('✅ Category saved — SKU-1099 is taxable');},600);
+      return {text:'✅ Done — confirmed <b>taxable</b> for SKU <b>SKU-1099</b>. The tax platform is now configured to collect on this SKU, and I added it to the taxonomy so future subscriptions on this plan stay consistent. <span style="color:var(--green)">No gap to close — it was classified at creation.</span><br><br>Want me to review any other recently created SKUs?',card:''};
+    }
     if(model==='rule'){
       removeQuick('✅ Apply new rate');
       setTimeout(function(){toast('✅ Applied — rate updated, liability +$29,860');},600);
@@ -201,25 +208,35 @@ function respond(q){
     setTimeout(function(){toast('✅ Applied — liability updated +$29,860');},600);
     return {text:'✅ Done — reclassification applied. The internal system now shows <b>taxable</b>, the liability is adjusted by <b>+$29,860</b>, and Agent 1 has updated the taxonomy so future WA digital SKUs won’t drift. <span style="color:var(--green)">Case DC-1042 is resolved.</span> <br><br>Want me to run an annual reconciliation to catch any other mismatches?',card:''};
   }
-  if(q.indexOf('why')>=0||q.indexOf('changed')>=0||q.indexOf('change')>=0||q.indexOf('rate')>=0){
+  if(q.indexOf('why')>=0||q.indexOf('changed')>=0||q.indexOf('change')>=0||q.indexOf('rate')>=0||q.indexOf('category')>=0||q.indexOf('classif')>=0){
+    if(model==='sku'){
+      return {text:'I assigned <b>taxable</b> because this SKU is a recurring <b>software subscription</b>, and Washington taxes digital services in-state (per <b>SB 6204</b>, effective Apr 2026). Since the billing address for this customer is in WA, the sale is taxable.',card:''};
+    }
     if(model==='rule'){
       return {text:'Washington raised the <b>combined sales tax rate</b> from <b>8.9% to 9.6%</b>, effective <b>April 2026</b>. Our billing system was still charging the old 8.9% rate, so the tax collected on these SKUs is understated versus the new rate — that’s the gap.',card:''};
     }
     return {text:'Washington updated the <b>digital-services taxability rule</b>, effective <b>April 2026</b>. Our internal billing system was still classifying SKU <b>SUB-WA-DIG</b> as <i>exempt</i>, but the tax platform picked up the new rule and treats it as <i>taxable</i>. That’s the classification mismatch driving the gap.',card:''};
   }
-  if(q.indexOf('skus')>=0||q.indexOf('affected')>=0||q.indexOf('old vs new')>=0||q.indexOf('source')>=0||q.indexOf('transaction')>=0||q.indexOf('txn')>=0){
+  if(q.indexOf('skus')>=0||q.indexOf('affected')>=0||q.indexOf('old vs new')>=0||q.indexOf('source')>=0||q.indexOf('transaction')>=0||q.indexOf('txn')>=0||q.indexOf('similar')>=0||q.indexOf('comparable')>=0){
+    if(model==='sku'){
+      return {text:'Here are similar SKUs I compared against to classify the new one.<br><table><tr><th>SKU</th><th>Product</th><th>Category</th></tr><tr><td>SKU-1099</td><td>Enterprise plan (annual)</td><td style="color:var(--green)">Taxable</td></tr><tr><td>SUB-WA-DIG</td><td>Digital subscription</td><td style="color:var(--green)">Taxable</td></tr><tr><td>SUB-WA-STD</td><td>Standard plan</td><td style="color:var(--green)">Taxable</td></tr><tr><td>ADD-WA-API</td><td>API add-on</td><td style="color:var(--green)">Taxable</td></tr><tr><td>SVC-MGMT</td><td>Professional services</td><td style="color:var(--amber)">Exempt</td></tr></table>',card:''};
+    }
     if(model==='rule'){
       return {text:'Here’s where the old and new tax stack up per SKU.<br><table><tr><th>SKU</th><th>Old tax (8.9%)</th><th>New tax (9.6%)</th><th>Δ</th></tr><tr><td>SUB-WA-DIG</td><td>$268,780</td><td>$289,920</td><td style="color:var(--green)">+$21,140</td></tr><tr><td>SUB-WA-STD</td><td>$75,396</td><td>$81,326</td><td style="color:var(--green)">+$5,930</td></tr><tr><td>ADD-WA-API</td><td>$39,857</td><td>$42,647</td><td style="color:var(--green)">+$2,790</td></tr></table>',card:''};
     }
     return {text:'Here are the source transactions behind the gap.<br><table><tr><th>Date</th><th>SKU</th><th>Amount</th><th>Tax</th></tr><tr><td>Apr 18</td><td>SUB-WA-DIG</td><td>$8,420</td><td>$672</td></tr><tr><td>May 02</td><td>SUB-WA-DIG</td><td>$9,180</td><td>$734</td></tr><tr><td>Jun 21</td><td>SUB-WA-DIG</td><td>$12,260</td><td>$981</td></tr></table>',card:''};
   }
-  if(q.indexOf('rule')>=0||q.indexOf('detail')>=0||q.indexOf('regulation')>=0){
-    if(model==='rule'){
+  if(q.indexOf('rule')>=0||q.indexOf('detail')>=0||q.indexOf('regulation')>=0||q.indexOf('standard')>=0){
+    if(model==='sku'){
+      return {text:'The classification uses the <b>WA digital-services taxability rule</b>. Software subscriptions delivered electronically are taxable in Washington, regardless of delivery method.',card:'<div class="tt">📄 Classification rule</div><div class="row"><span class="lab">Jurisdiction</span><span class="val">Washington (WA)</span></div><div class="row"><span class="lab">Rule</span><span class="val">SB 6204 (digital services taxable)</span></div><div class="row"><span class="lab">Category</span><span class="val green">Taxable</span></div><div class="row"><span class="lab">Effective</span><span class="val">Apr 2026</span></div><div class="row"><span class="lab">Applies to</span><span class="val">Software subscriptions / API</span></div>'};
       return {text:'The rate change comes from <b>WA Dept. of Revenue</b> — the combined sales tax rate increased for the jurisdiction.',card:'<div class="tt">📄 Rule detail</div><div class="row"><span class="lab">Jurisdiction</span><span class="val">Washington (WA)</span></div><div class="row"><span class="lab">Old rate</span><span class="val">8.9%</span></div><div class="row"><span class="lab">New rate</span><span class="val">9.6%</span></div><div class="row"><span class="lab">Effective</span><span class="val">Apr 2026</span></div><div class="row"><span class="lab">Scope</span><span class="val">All taxable sales</span></div>'};
     }
     return {text:'The rule change is <b>WA SB 6204</b> — digital services are now taxable in Washington, effective April 2026. This applies to SaaS/streaming/API subscriptions regardless of delivery method.',card:'<div class="tt">📄 Rule detail</div><div class="row"><span class="lab">Jurisdiction</span><span class="val">Washington (WA)</span></div><div class="row"><span class="lab">Rule</span><span class="val">SB 6204</span></div><div class="row"><span class="lab">Effective</span><span class="val">Apr 2026</span></div><div class="row"><span class="lab">Scope</span><span class="val">Digital services now taxable</span></div>'};
   }
   // default
+  if(model==='sku'){
+    return {text:'I found a new SKU in the catalog — <b>SKU-1099</b> (Enterprise plan, annual). It has no tax category assigned, so I classified it as <b>taxable</b> based on the WA digital-services rule. Want me to confirm and apply it?',card:''};
+  }
   if(model==='rule'){
     return {text:'Washington raised the sales tax rate to <b>9.6%</b> in April. Our billing was still using <b>8.9%</b>, so the tax on these SKUs is understated. The difference is <b>+$29,860</b> for Q3. Would you like me to apply the new rate and book the under-collected amount?',card:''};
   }
@@ -257,13 +274,24 @@ function renderRuleStart(){
   },1600);
 }
 
+function renderSkuStart(){
+  chat.innerHTML='';
+  addMsg('agent','Agent 1','While reconciling the catalog, I noticed a <b>new SKU</b> was just created: <b>SKU-1099</b> (Enterprise plan · annual). It has <b>no tax category</b> assigned — that would default to <i>exempt</i> and create a gap. I classified it for you instead. ⚡',true);
+  setTimeout(function(){showTyping();scrollBottom();},500);
+  setTimeout(function(){hideTyping();
+    addMsg('agent','Agent 1','Here’s what I assigned it 👇',true);
+    addCard('<div class="tt">🏷️ New SKU · tax category</div><div class="row"><span class="lab">SKU</span><span class="val">SKU-1099 (Enterprise plan · annual)</span></div><div class="row"><span class="lab">Assigned category</span><span class="val green">Taxable</span></div><div class="row"><span class="lab">Default (if unassigned)</span><span class="val amber">Exempt ⚠️</span></div><div class="row"><span class="lab">Tax platform</span><span class="val">Configures to collect</span></div><div class="row"><span class="lab">Based on</span><span class="val">WA digital-services rule · SB 6204</span></div><div class="row"><span class="lab">Confidence</span><span class="val green">High</span></div>');
+  },1600);
+}
+
 function goPanel(which){
-  model=which==='rule'?'rule':'disc';
-  document.getElementById('btnDisc').classList.toggle('active',which!=='rule');
+  model=which==='rule'?'rule':(which==='sku'?'sku':'disc');
+  document.getElementById('btnDisc').classList.toggle('active',which==='disc');
   document.getElementById('btnRule').classList.toggle('active',which==='rule');
-  document.getElementById('crumb').innerHTML=which==='rule'?'Regulatory Watch <b>/ Rate change · WA 8.9% → 9.6%</b>':'Discrepancies <b>/ Case DC-1042</b>';
+  document.getElementById('btnSku').classList.toggle('active',which==='sku');
+  document.getElementById('crumb').innerHTML=which==='rule'?'Regulatory Watch <b>/ Rate change · WA 8.9% → 9.6%</b>':(which==='sku'?'SKU Taxonomy <b>/ New SKU · SKU-1099</b>':'Discrepancies <b>/ Case DC-1042</b>');
   document.querySelectorAll('.nav .item').forEach(function(n){n.classList.remove('active')});
-  if(which==='rule')renderRuleStart();else renderDiscStart();
+  if(which==='rule')renderRuleStart();else if(which==='sku')renderSkuStart();else renderDiscStart();
   persistentSuggest();
 }
 renderDiscStart();
