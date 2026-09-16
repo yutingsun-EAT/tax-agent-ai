@@ -100,10 +100,10 @@
   <aside class="side">
     <div class="logo"><div class="mark">🪙</div> Tax Agent</div>
     <div class="nav">
-      <div class="item active"><span class="i">🔍</span> Discrepancies <span class="badge">3</span></div>
-      <div class="item" onclick="goPanel('rule')"><span class="i">📜</span> Rule Updates <span class="badge amber">1</span></div>
+      <div class="item" id="navDisc" onclick="goPanel('disc')"><span class="i">🔍</span> Discrepancies <span class="badge">3</span></div>
+      <div class="item" id="navRule" onclick="goPanel('rule')"><span class="i">📜</span> Rule Updates <span class="badge amber">1</span></div>
+      <div class="item" id="navSku" onclick="goPanel('sku')"><span class="i">📋</span> SKU Taxonomy</div>
       <div class="item"><span class="i">🧩</span> Tax Audit</div>
-      <div class="item"><span class="i">📋</span> SKU Taxonomy</div>
       <div class="item"><span class="i">🧾</span> Reports</div>
       <div class="item"><span class="i">⚙️</span> Settings</div>
     </div>
@@ -290,11 +290,12 @@ function goPanel(which){
   document.getElementById('btnRule').classList.toggle('active',which==='rule');
   document.getElementById('btnSku').classList.toggle('active',which==='sku');
   document.getElementById('crumb').innerHTML=which==='rule'?'Regulatory Watch <b>/ Rate change · WA 8.9% → 9.6%</b>':(which==='sku'?'SKU Taxonomy <b>/ New SKU · SKU-1099</b>':'Discrepancies <b>/ Case DC-1042</b>');
-  document.querySelectorAll('.nav .item').forEach(function(n){n.classList.remove('active')});
+  ['navDisc','navRule','navSku'].forEach(function(id){document.getElementById(id).classList.remove('active')});
+  document.getElementById(which==='rule'?'navRule':(which==='sku'?'navSku':'navDisc')).classList.add('active');
   if(which==='rule')renderRuleStart();else if(which==='sku')renderSkuStart();else renderDiscStart();
   persistentSuggest();
 }
-renderDiscStart();
+goPanel('disc');
 persistentSuggest();
 </script>
 </body>
