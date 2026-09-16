@@ -95,7 +95,33 @@
   .kpi .n{font-size:19px;font-weight:700}
   .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
 
-  @media(max-width:800px){.side{display:none}}
+  @media(max-width:800px){
+    .app{flex-direction:column;height:100vh;overflow:hidden}
+    .side{display:none}
+    .main{height:100vh}
+    .topbar{height:auto;flex-wrap:wrap;gap:8px;padding:10px 14px}
+    .topbar .crumb{font-size:13px;width:100%;order:1}
+    .topbar .right{order:2;margin-left:0}
+    .topbar .switch{order:3;margin-left:0;width:100%;padding:5px;justify-content:stretch}
+    .topbar .switch button{flex:1;justify-content:center;padding:10px 8px;font-size:12px}
+    .chatinner{padding:0 12px;gap:12px}
+    .chatscroll{padding:16px 0}
+    .msg .body{max-width:100%}
+    .msg .bubble{font-size:14px;padding:11px 13px}
+    .uicard{padding:12px}
+    table{font-size:12px}
+    th,td{padding:7px 8px}
+    .row{font-size:12px;padding:8px 0}
+    .composer{padding:12px 12px 10px}
+    .composer .suggest{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+    .composer .suggest button{flex-shrink:0}
+    .chatinput input{padding:11px 12px;font-size:16px}
+    .toast{left:12px;right:12px;bottom:12px;text-align:center}
+  }
+  @media(max-width:420px){
+    .topbar .right .pill{display:none}
+    .topbar .right{padding-bottom:2px}
+  }
 </style>
 </head>
 <body>
